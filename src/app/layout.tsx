@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Poppins, Lato, Inter, Rubik } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import TanstackProvider from "@/providers/TanstackProvider";
+
+// const lato = Rubik({
+//   subsets: ["latin"],
+//   weight: ["300", "400", "500", "700", "900"],
+//   variable: "--font-rubik",
+// });
+
+const rubik = localFont({
+  src: "./fonts/Rubik.ttf",
+  variable: "--font-rubik",
+  weight: "100 900",
+});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,11 +39,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang='en'>
+      <body className={`${rubik.variable} antialiased`}>
+        <Toaster richColors />
+        <TanstackProvider>
+          <div>{children}</div>
+        </TanstackProvider>
       </body>
     </html>
   );
