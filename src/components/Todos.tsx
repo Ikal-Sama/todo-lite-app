@@ -47,10 +47,12 @@ const Todos = () => {
     const res = await deleteNote(id);
     if (res.success && res.note) {
       toast.success("Note deleted successfully");
-      queryClient.setQueryData(["notes"], (oldData: any) => {
+      queryClient.setQueryData(["notes"], (oldData) => {
         return {
+          //@ts-expect-error
           ...oldData,
           // delete the note in the list
+          //@ts-expect-error
           notes: oldData.notes.filter((note: any) => note.id !== id),
         };
       });
@@ -100,7 +102,7 @@ const Todos = () => {
       setCheckedNotes([]);
     } else {
       //@ts-ignore
-      setCheckedNotes(data.notes.map((note: any) => note.id));
+      setCheckedNotes(data.notes.map((note) => note.id));
     }
   };
 
