@@ -1,12 +1,7 @@
 import Logo from "@/components/Logo";
 import ProfileSettings from "@/components/ProfileSettings";
-import SignOutButton from "@/components/SignOutButton";
 import { getUser } from "@/lib/lucia";
-import Image from "next/image";
 import { redirect } from "next/navigation";
-import { RiAddLine, RiSearch2Line } from "@remixicon/react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import AddNoteModal from "@/components/AddNoteModal";
 import { getUserNotes } from "@/actions/note.action";
 import {
@@ -15,7 +10,6 @@ import {
   HydrationBoundary,
 } from "@tanstack/react-query";
 import Todos from "@/components/Todos";
-import LoadTodos from "@/components/LoadTodos";
 import SearchNote from "@/components/SearchNote";
 
 const Dashboard = async () => {
