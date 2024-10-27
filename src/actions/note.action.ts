@@ -1,6 +1,7 @@
 "use server"
 
 import { addNoteSchema } from "@/components/AddNoteModal"
+import { updateNoteSchema } from "@/components/UpdateNoteModal"
 import { getUser } from "@/lib/lucia"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
@@ -90,5 +91,61 @@ export const deleteAllUserNotes = async() => {
         return {success: true, note: deletedNotes}
     } catch (error) {
         return {success: false, error: "Something went wrong deleting all notes"}
+    }
+}
+
+export const getUserNoteById = async(noteId: string) => {
+    const note = await prisma.note.findUnique({
+        where: {
+            id: noteId
+        }
+    })
+
+    if(!note) {
+        return {success: false, error: 'Note not found'}
+    }
+    
+    return {success: true, note: note}
+}
+
+export const updateNote = async(noteId: string, values: z.infer<typeof updateNoteSchema>) => {
+    try {
+        const updateNote = await prisma.note.update({
+            where: {
+                id: noteId
+            },
+            data: {
+                title: values.title,
+                description: values.description
+            }
+        })
+
+        if(!updateNote) {
+            return {success: false, error: 'Note not found'}
+        }
+        return {success: true, note: updateNote}
+    } catch (error) {
+        return {success: false, error: 'Something went wrong updating the note'}
+    }
+}
+
+export const searchNotes = async(searchTerm: string) => {
+    try {
+        const user= await getUser()
+        const notes = await prisma.note.findMany({
+            where: {
+                userId: user?.id,
+                OR: [
+                    {title: {contains: searchTerm, mode: 'insensitive'}},
+                ]
+            }
+        })
+        if(!notes) {
+            return { success: false, error: 'Notes not found' }
+        }
+
+        return {success: true, notes: notes}
+    } catch (error) {
+        return {success: false, error: "Something went wrong searching notes"}
     }
 }

@@ -9,7 +9,7 @@ import {
   getUserNotes,
 } from "@/actions/note.action";
 import { Button } from "./ui/button";
-import { RiDeleteBinLine, RiMore2Line } from "@remixicon/react";
+import { RiDeleteBinLine, RiMore2Line, RiQuestionLine } from "@remixicon/react";
 
 import {
   DropdownMenu,
@@ -22,6 +22,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import LoadingSpinner from "./LoadingSpinner";
+import AlertDialogModal from "./modal/AlertDialog";
+import UpdateNoteModal from "./UpdateNoteModal";
 
 const Todos = () => {
   const queryClient = useQueryClient();
@@ -32,6 +34,10 @@ const Todos = () => {
   const [checkedNotes, setCheckedNotes] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [deletionMode, setDeletionMode] = useState<"single" | "all">("single");
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [currentNoteId, setCurrentNoteId] = useState<string | null>(null);
 
   if (isFetching) {
     return <LoadingSpinner />;
@@ -98,12 +104,43 @@ const Todos = () => {
     }
   };
 
-  //   if (loading) {
-  //     return <LoadingSpinner />;
-  //   }
+  const openDeleteModal = (mode: "single" | "all", noteId?: string) => {
+    setDeletionMode(mode);
+    if (noteId) setCurrentNoteId(noteId);
+    setIsOpenModal(true);
+  };
+
+  const confirmDeletion = async () => {
+    setIsOpenModal(false);
+    if (deletionMode === "single" && currentNoteId) {
+      await handleDelete(currentNoteId);
+    } else {
+      await handleDeleteSelectedNotes();
+    }
+    setCurrentNoteId(null);
+  };
 
   return (
     <div className='h-full'>
+      <UpdateNoteModal
+        isOpen={isUpdateModalOpen}
+        note={currentNoteId}
+        onClose={() => setIsUpdateModalOpen(false)}
+      />
+
+      <AlertDialogModal
+        title={
+          <div className='flex gap-2 items-center'>
+            <span>Confirm Deletion</span>
+            <RiQuestionLine className='text-primary' />
+          </div>
+        }
+        description='Are you sure you want to delete the selected note(s)? This action cannot be undone.'
+        submitButtonText={loading ? "Deleting..." : "Confirm"}
+        isOpen={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+        onConfirm={confirmDeletion}
+      />
       {data?.notes && data.notes.length > 0 ? (
         <div className='h-full overflow-auto rounded-md overflow-y-scroll scrollbar-thumb-rounded-sm scrollbar-thin scrollbar-thumb-primary-DEFAULT scrollbar-w-2 flex flex-col gap-2 shadow-sm '>
           {/* add a select all then checked all the notes then i can delete all */}
@@ -122,7 +159,7 @@ const Todos = () => {
                 <Button
                   size='icon'
                   variant='destructive'
-                  onClick={handleDeleteSelectedNotes}
+                  onClick={() => openDeleteModal("all")}
                   disabled={checkedNotes.length === 0}
                 >
                   <RiDeleteBinLine className='w-4 h-4' />
@@ -151,8 +188,17 @@ const Todos = () => {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>View</DropdownMenuItem>
-                    <DropdownMenuItem>Update</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(note.id)}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setCurrentNoteId(note.id);
+                        setIsUpdateModalOpen(true);
+                      }}
+                    >
+                      Update
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => openDeleteModal("single", note.id)}
+                    >
                       Remove
                     </DropdownMenuItem>
                   </DropdownMenuContent>

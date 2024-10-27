@@ -16,6 +16,7 @@ import {
 } from "@tanstack/react-query";
 import Todos from "@/components/Todos";
 import LoadTodos from "@/components/LoadTodos";
+import SearchNote from "@/components/SearchNote";
 
 const Dashboard = async () => {
   const user = await getUser();
@@ -46,10 +47,7 @@ const Dashboard = async () => {
       <div className='mt-10'>
         <div className='flex justify-between items-center'>
           {/* Search here */}
-          <div className='relative'>
-            <Input placeholder='Find note' className='w-[300px] ' />
-            <RiSearch2Line className='absolute top-2 right-2 w-5 h-5 text-muted-foreground' />
-          </div>
+          <SearchNote />
           {/* Add note modal */}
           <AddNoteModal />
         </div>
@@ -62,36 +60,6 @@ const Dashboard = async () => {
           <Todos />
         </HydrationBoundary>
       </div>
-
-      {/* {notes.notes && notes.notes?.length > 0 ? (
-        notes.notes && (
-          <div className='mt-5'>
-            {notes.notes?.map((note, index) => (
-              <div key={index} className='border p-2 rounded-md'>
-                <div>
-                  <h1 className='capitalize font-medium'>{note.title}</h1>
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      ) : (
-        <div className='flex flex-col items-center justify-center py-20 '>
-          <div className='bg-red-50 p-5 rounded-full'>
-            <Image
-              src='/assets/notebook.png'
-              alt='Note Image Empty'
-              width={100}
-              height={100}
-              className='bg-none'
-            />
-          </div>
-          <h1 className='text-lg font-medium mt-4'>
-            You don&apos;t have a note.
-          </h1>
-          <p className='text-muted-foreground'>Create your first note</p>
-        </div>
-      )} */}
     </div>
   );
 };
